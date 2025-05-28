@@ -1,7 +1,4 @@
 name = "problemdetails-site"
 compatibility_date = "2024-05-28"
 pages_build_output_dir = "./public"
-
-[site]
-bucket = "./public"
-entry-point = "functions"
+main = "./functions"
