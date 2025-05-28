@@ -1,0 +1,7 @@
+name = "problemdetails-site"
+type = "javascript"
+compatibility_date = "2024-05-28"
+
+[site]
+bucket = "./public"
+entry-point = "functions"

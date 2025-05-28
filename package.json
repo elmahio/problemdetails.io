@@ -1,0 +1,9 @@
+{
+  "name": "problemdetails-site",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler pages deploy ./public"
+  },
+  "dependencies": {}
+}
