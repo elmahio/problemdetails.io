@@ -3,24 +3,121 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Problem Details Test Service</title>
+  <title>Problem Details Test API</title>
+  <meta name="description" content="Test HTTP API responses using the standardized Problem Details format (RFC 7807). Useful for testing error handling, observability, and client parsing." />
+  <meta property="og:title" content="Problem Details Test API" />
+  <meta property="og:description" content="Test real-world API errors with standardized RFC 7807 responses. Useful for error handling, observability, and automated tests." />
+  <meta property="og:url" content="https://problemdetails.io" />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="https://problemdetails.io/favicon.png" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script>hljs.highlightAll();</script>
   <style>
-    body { font-family: sans-serif; max-width: 700px; margin: 2rem auto; }
-    code { background: #eee; padding: 0.2em 0.4em; border-radius: 4px; }
+    :root {
+      --primary: #2a7ae2;
+      --gray: #666;
+      --background: #f9f9f9;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 2rem;
+      background: var(--background);
+      color: #222;
+    }
+    h1, h2 {
+      color: var(--primary);
+    }
+    ul {
+      padding-left: 1.5rem;
+    }
+    code, pre {
+      background: #f0f0f0;
+      border-radius: 4px;
+      padding: 0.5rem;
+      overflow-x: auto;
+    }
+    pre {
+      margin: 1rem 0;
+    }
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+    footer {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 1px solid #ddd;
+      font-size: 0.9em;
+      color: var(--gray);
+    }
   </style>
 </head>
 <body>
   <h1>Problem Details Test API</h1>
-  <p>This service provides test endpoints returning <code>application/problem+json</code> according to RFC 7807.</p>
+  <p>This service provides test endpoints that return structured error responses in the <code>application/problem+json</code> format, as defined in <a href="https://datatracker.ietf.org/doc/html/rfc7807" target="_blank" rel="noopener">RFC 7807</a>. It's useful for developers testing HTTP clients, middleware, error handling, logging, and observability pipelines.</p>
+
   <h2>Endpoints</h2>
+  <p>Each of these returns a Problem Details JSON object with a relevant HTTP status code:</p>
   <ul>
-    <li><a href="/problem">/problem</a></li>
-    <li><a href="/problem/unauthorized">/problem/unauthorized</a></li>
-    <li><a href="/problem/not-found">/problem/not-found</a></li>
-    <li><a href="/problem/validation-error">/problem/validation-error</a></li>
-    <li><a href="/problem/server-error">/problem/server-error</a></li>
-    <li><a href="/problem/too-many-requests">/problem/too-many-requests</a></li>
+    <li><a href="/problem">/problem</a> – <code>400 Bad Request</code> for invalid input</li>
+    <li><a href="/problem/unauthorized">/problem/unauthorized</a> – <code>401 Unauthorized</code> to test auth logic</li>
+    <li><a href="/problem/not-found">/problem/not-found</a> – <code>404 Not Found</code> when a resource is missing</li>
+    <li><a href="/problem/validation-error">/problem/validation-error</a> – <code>400</code> with structured field-level errors</li>
+    <li><a href="/problem/server-error">/problem/server-error</a> – <code>500 Internal Server Error</code> simulation</li>
+    <li><a href="/problem/too-many-requests">/problem/too-many-requests</a> – <code>429 Too Many Requests</code> for rate limiting</li>
   </ul>
-  <p>problemdetails.io with ❤️ by <a href="https://elmah.io">elmah.io</a>.</p>
+
+  <h2>What is Problem Details?</h2>
+  <p>Problem Details is a standardized way to express HTTP API errors using a machine-readable JSON format. Introduced in <a href="https://datatracker.ietf.org/doc/html/rfc7807" target="_blank">RFC 7807</a>, it aims to replace ad-hoc error structures and magic strings in APIs.</p>
+  <p>Each error response contains a consistent set of fields:</p>
+  <ul>
+    <li><code>type</code>: A URI identifying the kind of error (ideally documentation or a standard identifier)</li>
+    <li><code>title</code>: A short human-readable summary</li>
+    <li><code>status</code>: HTTP status code (e.g. 404)</li>
+    <li><code>detail</code>: A detailed explanation for debugging purposes</li>
+    <li><code>instance</code>: A URI identifying the specific occurrence (like a trace ID or log link)</li>
+  </ul>
+
+  <p>Here’s a typical Problem Details response:</p>
+  <pre><code class="json">{
+  "type": "https://example.com/errors/invalid-input",
+  "title": "Invalid input",
+  "status": 400,
+  "detail": "The 'email' field is required and must be a valid email address.",
+  "instance": "/users/register"
+}</code></pre>
+
+  <p>And a validation error example with extended fields:</p>
+  <pre><code class="json">{
+  "type": "https://example.com/errors/validation",
+  "title": "Validation Failed",
+  "status": 400,
+  "detail": "Multiple validation errors occurred.",
+  "instance": "/signup",
+  "errors": {
+    "email": ["Email is required.", "Email must be valid."],
+    "password": ["Password must be at least 8 characters."]
+  }
+}</code></pre>
+
+  <h2>Why use this site?</h2>
+  <p>If you're building HTTP APIs or consuming them, this service helps you:</p>
+  <ul>
+    <li>Validate client behavior under error conditions</li>
+    <li>Simulate various HTTP errors in CI tests</li>
+    <li>Evaluate logging or alerting strategies with predictable payloads</li>
+    <li>Train developers or QA on error structure</li>
+  </ul>
+
+  <footer>
+    <p><small>Made with ❤️ by <a href="https://elmah.io" target="_blank" rel="noopener">elmah.io</a> — the error logging and uptime monitoring service for .NET developers.</small></p>
+  </footer>
 </body>
 </html>
